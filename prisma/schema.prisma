@@ -158,6 +158,11 @@ model FileObject {
   status    FileStatus @default(UPLOADING)
   createdAt DateTime   @default(now())
 
+  // NEW
+  width     Int?
+  height    Int?
+  thumbKey  String?
+
   attachments Attachment[]
 
   @@unique([bucket, key])
