@@ -10,6 +10,7 @@ import { PresenceModule } from './modules/presence/presence.module';
 import { ReceiptsModule } from './modules/receipts/receipts.module';
 import { ReactionsModule } from './modules/reactions/reactions.module';
 import { IdempotencyModule } from './modules/idempotency/idempotency.module';
+import { OutboxModule } from './modules/outbox/outbox.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { IdempotencyModule } from './modules/idempotency/idempotency.module';
     ReceiptsModule,
     ReactionsModule,
     IdempotencyModule,
+    OutboxModule,
   ],
   providers: [MessagingGateway],
 })

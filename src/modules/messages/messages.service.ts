@@ -8,12 +8,14 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { SendMessageDto } from './dto/send-message.dto';
 import { MessagingGateway } from '../../websockets/messaging.gateway';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import { OutboxProducer } from '../outbox/outbox.producer';
 
 @Injectable()
 export class MessagesService {
   constructor(
     private prisma: PrismaService,
     private gateway: MessagingGateway,
+    private outbox: OutboxProducer,
   ) {}
 
   async list(conversationId: string, cursor?: string, limit = 30) {
@@ -61,8 +63,10 @@ export class MessagesService {
       }),
     ]);
 
-    this.gateway.emitToConversation(dto.conversationId, 'message.created', {
-      message: msg,
+    // 🔁 Thay vì phát WS ngay, ta ghi Outbox trong transaction riêng (hoặc dùng $transaction hiện tại nếu bạn wrap khác)
+    await this.outbox.emit('messaging.message_created', {
+      messageId: msg.id,
+      conversationId: dto.conversationId,
     });
     return msg;
   }
