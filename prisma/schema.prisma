@@ -121,3 +121,10 @@ model ReadReceipt {
   @@index([userId])
 }
 
+model Idempotency {
+  key        String   @id                  // ví dụ: UUID v4 từ client
+  status     String   @default("IN_PROGRESS") // IN_PROGRESS | COMPLETED | FAILED
+  response   Json?                          // lưu kết quả để trả lại (ví dụ: { messageId: "..." })
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
