@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ConversationType { 
+  DIRECT 
+  GROUP 
+}
+enum MemberRole { 
+  MEMBER 
+  ADMIN 
+  OWNER 
+}
+
+model Conversation {
+  id          String   @id @default(cuid())
+  type        ConversationType
+  title       String?
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     ConversationMember[]
+  message Message[]
+
+  @@index([type])
+}
+
+model ConversationMember {
+  id             String   @id @default(cuid())
+  conversationId String
+  userId         String
+  role           MemberRole @default(MEMBER)
+  lastReadAt     DateTime?
+  pinned         Boolean @default(false)
+  muted          Boolean @default(false)
+  joinedAt       DateTime @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+}
+
+
+enum MessageType { 
+  TEXT 
+  IMAGE 
+  FILE 
+  SYSTEM 
+}
+
+// --- Trong model Message: thêm self-relation + index ---
+model Message {
+  id             String      @id @default(cuid())
+  conversationId String
+  senderId       String
+  type           MessageType @default(TEXT)
+  content        String?
+  parentId       String?
+  metadata       Json?
+  editedAt       DateTime?
+  deletedAt      DateTime?
+  createdAt      DateTime    @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  // ✅ Thread self-relation
+  parent         Message?    @relation("Thread", fields: [parentId], references: [id])
+  replies        Message[]   @relation("Thread")
+  reaction Reaction[]
+  readReceipt ReadReceipt[]
+
+  // ✅ Index để load thread nhanh
+  @@index([conversationId, createdAt])
+  @@index([parentId, createdAt])
+}
+
+// --- NEW: Reaction ---
+model Reaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])   // mỗi user/emoji chỉ 1 lần trên 1 message
+  @@index([messageId])
+}
+
+
+model ReadReceipt {
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@id([messageId, userId])
+  @@index([userId])
+}
+
