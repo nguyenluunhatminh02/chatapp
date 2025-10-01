@@ -19,7 +19,7 @@ export class MessagesService {
   ) {}
 
   async list(conversationId: string, cursor?: string, limit = 30) {
-    return this.prisma.message.findMany({
+    return await this.prisma.message.findMany({
       where: { conversationId, deletedAt: null },
       orderBy: { createdAt: 'desc' },
       take: limit,

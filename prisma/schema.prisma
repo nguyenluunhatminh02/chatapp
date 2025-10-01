@@ -139,8 +139,13 @@ model Outbox {
   publishedAt DateTime?
   attempts    Int      @default(0)
   lastError   String?
+
+  // NEW cho multi-instance
+  claimedAt   DateTime?
+  claimedBy   String?
   
   @@index([topic, createdAt])
+  @@index([claimedAt, publishedAt])
 }
 
 enum FileStatus { 
