@@ -11,6 +11,7 @@ import { ReceiptsModule } from './modules/receipts/receipts.module';
 import { ReactionsModule } from './modules/reactions/reactions.module';
 import { IdempotencyModule } from './modules/idempotency/idempotency.module';
 import { OutboxModule } from './modules/outbox/outbox.module';
+import { FilesModule } from './modules/files/files.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { OutboxModule } from './modules/outbox/outbox.module';
     ReactionsModule,
     IdempotencyModule,
     OutboxModule,
+    FilesModule,
   ],
   providers: [MessagingGateway],
 })
