@@ -12,6 +12,7 @@ import { ReactionsModule } from './modules/reactions/reactions.module';
 import { IdempotencyModule } from './modules/idempotency/idempotency.module';
 import { OutboxModule } from './modules/outbox/outbox.module';
 import { FilesModule } from './modules/files/files.module';
+import { SearchModule } from './modules/search/search.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { FilesModule } from './modules/files/files.module';
     IdempotencyModule,
     OutboxModule,
     FilesModule,
+    SearchModule,
   ],
   providers: [MessagingGateway],
 })

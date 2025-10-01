@@ -111,6 +111,11 @@ export class MessagesService {
       editedAt: updated.editedAt,
     });
 
+    // NEW: outbox cho search
+    await this.outbox.emit('messaging.message_updated', {
+      messageId: updated.id,
+    });
+
     return updated;
   }
 
@@ -150,6 +155,11 @@ export class MessagesService {
     this.gateway.emitToConversation(msg.conversationId, 'message.deleted', {
       id: deleted.id,
       deletedAt: deleted.deletedAt,
+    });
+
+    // NEW: outbox cho search
+    await this.outbox.emit('messaging.message_deleted', {
+      messageId: deleted.id,
     });
 
     return deleted;
